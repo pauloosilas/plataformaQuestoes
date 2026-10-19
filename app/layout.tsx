@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const dns = require("dns");
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 export const metadata: Metadata = {
   title: "Trilha — seu espaço de estudos",
