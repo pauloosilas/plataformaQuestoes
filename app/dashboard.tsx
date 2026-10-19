@@ -21,6 +21,43 @@ function normalizeName(value: string) {
   return value.trim().normalize("NFC").toLocaleLowerCase("pt-BR");
 }
 
+const allowedQuestionTags = new Set([
+  "br", "hr", "u", "strong", "b", "em", "i", "p", "div", "span",
+  "ul", "ol", "li", "blockquote", "sup", "sub", "small", "code", "pre", "mark", "s", "del",
+]);
+const voidQuestionTags = new Set(["br", "hr"]);
+const blockedQuestionTags = new Set(["script", "style", "iframe", "object", "embed", "svg", "math", "template"]);
+
+function escapeHtmlText(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function sanitizeQuestionMarkup(markup: string): string {
+  const document = new DOMParser().parseFromString(markup, "text/html");
+
+  function serialize(node: Node): string {
+    if (node.nodeType === 3) return escapeHtmlText(node.textContent ?? "");
+    if (node.nodeType !== 1) return "";
+
+    const element = node as Element;
+    const tag = element.tagName.toLowerCase();
+    if (blockedQuestionTags.has(tag)) return "";
+
+    const content = Array.from(element.childNodes, serialize).join("");
+    if (!allowedQuestionTags.has(tag)) return content;
+    if (voidQuestionTags.has(tag)) return `<${tag}>`;
+
+    // Rebuild tags without attributes so event handlers, URLs and inline styles cannot run.
+    return `<${tag}>${content}</${tag}>`;
+  }
+
+  return Array.from(document.body.childNodes, serialize).join("");
+}
+
+function QuestionMarkup({ html, className }: { html: string; className: string }) {
+  return <div className={className} dangerouslySetInnerHTML={{ __html: sanitizeQuestionMarkup(html) }} />;
+}
+
 function styleFor(discipline: Discipline, index: number) {
   return disciplineStyles[discipline.name] ?? { icon: discipline.name.slice(0, 2).toLocaleUpperCase("pt-BR"), color: palette[index % palette.length] };
 }
@@ -274,7 +311,7 @@ function DisciplinePage({
         <div className="question-progress-heading"><span>QUESTÃO {String(questionIndex + 1).padStart(2, "0")}</span><span>{questionIndex + 1} de {quiz.questions.length}</span></div>
         <div className="question-progress-track" aria-hidden="true"><span style={{ width: `${((questionIndex + 1) / quiz.questions.length) * 100}%` }} /></div>
         <article className="question-content">
-          <h2>{currentQuestion.question}</h2>
+          <QuestionMarkup className="question-title" html={currentQuestion.question} />
           <div className="question-options" role="group" aria-label="Alternativas">
             {currentQuestion.options.map((option, index) => {
               const isCorrect = answered && index === currentQuestion.correct;
@@ -286,13 +323,13 @@ function DisciplinePage({
                 onClick={() => { if (!answered) onSelectAnswer(index); }}
                 disabled={answered}
                 aria-pressed={selectedAnswer === index}
-              ><span className="option-letter">{String.fromCharCode(65 + index)}</span><span className="option-text">{option}</span><span className="option-result" aria-hidden="true">{isCorrect ? "✓" : isWrongSelection ? "×" : ""}</span></button>;
+              ><span className="option-letter">{String.fromCharCode(65 + index)}</span><QuestionMarkup className="option-text" html={option} /><span className="option-result" aria-hidden="true">{isCorrect ? "✓" : isWrongSelection ? "×" : ""}</span></button>;
             })}
           </div>
 
           {answered && <section className="question-explanation" aria-live="polite">
             <div className="explanation-heading"><span>✦</span><h3>Explicação</h3></div>
-            <p>{currentQuestion.explanation.replace(/<br\s*\/?>/gi, "\n")}</p>
+            <QuestionMarkup className="question-explanation-text" html={currentQuestion.explanation} />
           </section>}
         </article>
         <div className="question-navigation">

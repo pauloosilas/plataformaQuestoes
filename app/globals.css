@@ -478,7 +478,8 @@ html[data-theme="dark"] .question-form .field-hint code, html[data-theme="dark"]
 .question-progress-track { height: 5px; overflow: hidden; border-radius: 9px; background: #edf0e7; }
 .question-progress-track > span { display: block; height: 100%; border-radius: inherit; background: #829467; transition: width .25s ease; }
 .question-content { padding: 24px 0 0; }
-.question-content > h2 { margin: 0 0 20px; color: #34362e; font-family: Georgia, "Times New Roman", serif; font-size: clamp(18px, 2.7vw, 23px); font-weight: 500; line-height: 1.55; white-space: pre-wrap; }
+.question-title { margin: 0 0 20px; color: #34362e; font-family: Georgia, "Times New Roman", serif; font-size: clamp(18px, 2.7vw, 23px); font-weight: 500; line-height: 1.55; white-space: pre-wrap; }
+.question-title p, .question-title div { margin: 0; }
 .question-options { display: grid; gap: 10px; }
 .question-option { display: grid; grid-template-columns: 30px minmax(0, 1fr) 22px; align-items: center; gap: 11px; width: 100%; min-height: 53px; padding: 10px 13px; border: 1px solid #e5e8df; border-radius: 8px; background: #fff; color: #55574e; cursor: pointer; text-align: left; transition: border-color .16s, background .16s, transform .16s; }
 .question-option:hover:not(:disabled) { transform: translateY(-1px); border-color: #a8b593; background: #fbfcf8; }
@@ -497,7 +498,9 @@ html[data-theme="dark"] .question-form .field-hint code, html[data-theme="dark"]
 .explanation-heading { display: flex; align-items: center; gap: 8px; }
 .explanation-heading > span { color: #819267; }
 .explanation-heading h3 { margin: 0; color: #596b43; font-size: 11px; font-weight: 700; }
-.question-explanation > p { margin: 9px 0 0; color: #65695c; font-size: 11px; line-height: 1.8; white-space: pre-line; }
+.question-explanation-text { margin-top: 9px; color: #65695c; font-size: 11px; line-height: 1.8; white-space: pre-line; }
+.question-explanation-text p, .question-explanation-text div { margin: 0 0 8px; }
+.question-explanation-text p:last-child, .question-explanation-text div:last-child { margin-bottom: 0; }
 .question-navigation { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 22px; margin-top: 22px; border-top: 1px solid #f0f0ec; }
 .question-previous, .question-next { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 8px; padding: 0 14px; border-radius: 7px; cursor: pointer; font-size: 11px; font-weight: 600; transition: background .16s, border-color .16s, transform .16s; }
 .question-previous { border: 1px solid #e4e6df; background: #fff; color: #6f7465; }
@@ -514,7 +517,7 @@ html[data-theme="dark"] .question-form .field-hint code, html[data-theme="dark"]
 html[data-theme="dark"] .question-session { border-color: #343a31; background: #20241f; }
 html[data-theme="dark"] .question-session-top, html[data-theme="dark"] .question-navigation { border-color: #343a31; }
 html[data-theme="dark"] .question-session-top { color: #a1a598; }
-html[data-theme="dark"] .question-content > h2 { color: #eceee7; }
+html[data-theme="dark"] .question-title { color: #eceee7; }
 html[data-theme="dark"] .question-option { border-color: #3b4137; background: #191d19; color: #d6d9cf; }
 html[data-theme="dark"] .question-option:hover:not(:disabled) { border-color: #58674a; background: #22271f; }
 html[data-theme="dark"] .option-letter { background: #30352d; color: #bdcda3; }
@@ -524,7 +527,7 @@ html[data-theme="dark"] .question-option.option-wrong { border-color: #754b43; b
 html[data-theme="dark"] .option-wrong .option-letter { background: #4b302b; color: #e3b2a8; }
 html[data-theme="dark"] .question-explanation { border-color: #46523b; background: #293124; }
 html[data-theme="dark"] .explanation-heading h3 { color: #c2d0aa; }
-html[data-theme="dark"] .question-explanation > p { color: #c0c5b6; }
+html[data-theme="dark"] .question-explanation-text { color: #c0c5b6; }
 html[data-theme="dark"] .question-previous { border-color: #3b4137; background: #191d19; color: #c0c5b6; }
 html[data-theme="dark"] .question-previous:hover:not(:disabled) { background: #252a23; }
 html[data-theme="dark"] .question-progress-heading { color: #a1a598; }
