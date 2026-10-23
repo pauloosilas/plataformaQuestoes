@@ -21,6 +21,15 @@ function normalizeName(value: string) {
   return value.trim().normalize("NFC").toLocaleLowerCase("pt-BR");
 }
 
+function shuffledIndices(length: number) {
+  const indices = Array.from({ length }, (_, index) => index);
+  for (let index = indices.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [indices[index], indices[swapIndex]] = [indices[swapIndex], indices[index]];
+  }
+  return indices;
+}
+
 const allowedQuestionTags = new Set([
   "br", "hr", "u", "strong", "b", "em", "i", "p", "div", "span",
   "ul", "ol", "li", "blockquote", "sup", "sub", "small", "code", "pre", "mark", "s", "del",
@@ -98,6 +107,8 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizError, setQuizError] = useState("");
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [randomMode, setRandomMode] = useState(false);
+  const [questionOrder, setQuestionOrder] = useState<number[]>([]);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const activeSubitemParent = disciplines.find((discipline) => discipline.subitems.includes(active));
   const activeDisciplineName = activeSubitemParent?.name ?? active;
@@ -123,6 +134,7 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
     setQuiz(null);
     setQuizError("");
     setQuestionIndex(0);
+    setQuestionOrder([]);
     setAnswers({});
     setQuery("");
     setMobileOpen(false);
@@ -134,6 +146,7 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
     setQuizError("");
     setQuizLoading(true);
     setQuestionIndex(0);
+    setQuestionOrder([]);
     setAnswers({});
 
     const params = new URLSearchParams({
@@ -147,6 +160,9 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
       const result = (await response.json()) as { topic?: QuizTopic; message?: string };
       if (!response.ok || !result.topic) throw new Error(result.message ?? "Não foi possível carregar esse assunto.");
       setQuiz(result.topic);
+      setQuestionOrder(randomMode
+        ? shuffledIndices(result.topic.questions.length)
+        : result.topic.questions.map((_, index) => index));
     } catch (error) {
       setQuizError(error instanceof Error ? error.message : "Não foi possível carregar as questões. Tente novamente.");
     } finally {
@@ -159,7 +175,21 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
     setQuizError("");
     setSelectedTopic("");
     setQuestionIndex(0);
+    setQuestionOrder([]);
     setAnswers({});
+  }
+
+  function changeRandomMode(enabled: boolean) {
+    setRandomMode(enabled);
+    if (!quiz) return;
+
+    const currentQuestion = questionOrder[questionIndex] ?? questionIndex;
+    const nextOrder = enabled
+      ? shuffledIndices(quiz.questions.length)
+      : quiz.questions.map((_, index) => index);
+    setQuestionOrder(nextOrder);
+    const nextPosition = nextOrder.indexOf(currentQuestion);
+    setQuestionIndex(nextPosition >= 0 ? nextPosition : 0);
   }
 
   async function signOut() {
@@ -246,10 +276,16 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
             quizLoading={quizLoading}
             quizError={quizError}
             questionIndex={questionIndex}
+            questionOrder={questionOrder}
+            randomMode={randomMode}
             answers={answers}
             onOpenTopic={openTopic}
-            onSelectAnswer={(answer) => setAnswers((current) => ({ ...current, [questionIndex]: answer }))}
+            onSelectAnswer={(answer) => {
+              const originalIndex = questionOrder[questionIndex] ?? questionIndex;
+              setAnswers((current) => ({ ...current, [originalIndex]: answer }));
+            }}
             onQuestionChange={setQuestionIndex}
+            onRandomModeChange={changeRandomMode}
             onCloseQuiz={closeQuiz}
           />}
         </div>
@@ -268,10 +304,13 @@ function DisciplinePage({
   quizLoading,
   quizError,
   questionIndex,
+  questionOrder,
+  randomMode,
   answers,
   onOpenTopic,
   onSelectAnswer,
   onQuestionChange,
+  onRandomModeChange,
   onCloseQuiz,
 }: {
   name: string;
@@ -283,16 +322,21 @@ function DisciplinePage({
   quizLoading: boolean;
   quizError: string;
   questionIndex: number;
+  questionOrder: number[];
+  randomMode: boolean;
   answers: Record<number, number>;
   onOpenTopic: (topic: QuestionTopic) => void;
   onSelectAnswer: (answer: number) => void;
   onQuestionChange: (index: number) => void;
+  onRandomModeChange: (enabled: boolean) => void;
   onCloseQuiz: () => void;
 }) {
   const filteredTopics = topics.filter((topic) => topic.title.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR")));
-  const currentQuestion = quiz?.questions[questionIndex];
-  const selectedAnswer = answers[questionIndex];
+  const originalQuestionIndex = questionOrder[questionIndex] ?? questionIndex;
+  const currentQuestion = quiz?.questions[originalQuestionIndex];
+  const selectedAnswer = answers[originalQuestionIndex];
   const answered = selectedAnswer !== undefined;
+  const answeredCount = quiz ? quiz.questions.reduce((count, _, index) => count + (answers[index] !== undefined ? 1 : 0), 0) : 0;
   const isLastQuestion = quiz ? questionIndex === quiz.questions.length - 1 : false;
 
   return (
@@ -308,9 +352,15 @@ function DisciplinePage({
 
       {!quizLoading && quiz && currentQuestion && <section className="question-session" aria-label={`Questões de ${quiz.title}`}>
         <div className="question-session-top"><button type="button" className="quiz-back-button" onClick={onCloseQuiz}>← <span>Voltar aos assuntos</span></button><span>{quiz.title}</span></div>
-        <div className="question-progress-heading"><span>QUESTÃO {String(questionIndex + 1).padStart(2, "0")}</span><span>{questionIndex + 1} de {quiz.questions.length}</span></div>
-        <div className="question-progress-track" aria-hidden="true"><span style={{ width: `${((questionIndex + 1) / quiz.questions.length) * 100}%` }} /></div>
+        <div className="question-progress-heading"><span>QUESTÃO {String(questionIndex + 1).padStart(2, "0")}</span><span>{answeredCount} de {quiz.questions.length} respondidas</span></div>
+        <div className="question-progress-track" role="progressbar" aria-label="Questões respondidas" aria-valuemin={0} aria-valuemax={quiz.questions.length} aria-valuenow={answeredCount}><span style={{ width: `${(answeredCount / quiz.questions.length) * 100}%` }} /></div>
         <article className="question-content">
+          <div className="question-mode-row">
+            <span className="question-mode-copy" id="random-mode-label"><strong>Modo aleatório</strong><small>Embaralhar a ordem das questões</small></span>
+            <button type="button" role="switch" aria-checked={randomMode} aria-labelledby="random-mode-label" className={`mode-switch ${randomMode ? "mode-switch-on" : ""}`} onClick={() => onRandomModeChange(!randomMode)}>
+              <span className="mode-switch-thumb" />
+            </button>
+          </div>
           <QuestionMarkup className="question-title" html={currentQuestion.question} />
           <div className="question-options" role="group" aria-label="Alternativas">
             {currentQuestion.options.map((option, index) => {
