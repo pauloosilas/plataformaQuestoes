@@ -108,6 +108,17 @@ export async function listQuestionTopicSummaries(): Promise<DisciplineTopicSumma
   ]).toArray();
 }
 
+export async function listQuestionTopicsForDiscipline(discipline: string, subitem: string): Promise<Pick<DisciplineTopicSummary, "key" | "title">[]> {
+  const collection = await getQuestionTopicsCollection();
+  return collection.find(
+    {
+      normalizedDiscipline: normalizeName(discipline),
+      normalizedSubitem: normalizeName(subitem),
+    },
+    { projection: { _id: 0, key: 1, title: 1 } },
+  ).sort({ title: 1 }).toArray();
+}
+
 export async function getQuestionTopic(
   discipline: string,
   subitem: string,
@@ -124,4 +135,14 @@ export async function getQuestionTopic(
   );
 
   return topic ? { key: topic.key, title: topic.title, questions: topic.questions } : null;
+}
+
+export async function deleteQuestionTopic(discipline: string, subitem: string, key: string) {
+  const collection = await getQuestionTopicsCollection();
+  const result = await collection.deleteOne({
+    normalizedDiscipline: normalizeName(discipline),
+    normalizedSubitem: normalizeName(subitem),
+    key,
+  });
+  return result.deletedCount > 0;
 }

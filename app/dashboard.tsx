@@ -101,6 +101,11 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   const [openDiscipline, setOpenDiscipline] = useState("Contagem");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [visibleTopics, setVisibleTopics] = useState(questionTopics);
+  const [deleteCandidate, setDeleteCandidate] = useState<QuestionTopic | null>(null);
+  const [deleteSubitem, setDeleteSubitem] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [quiz, setQuiz] = useState<QuizTopic | null>(null);
@@ -113,7 +118,7 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   const activeSubitemParent = disciplines.find((discipline) => discipline.subitems.includes(active));
   const activeDisciplineName = activeSubitemParent?.name ?? active;
   const activeSubitemName = activeSubitemParent ? active : "";
-  const topics = questionTopics.filter((topic) =>
+  const topics = visibleTopics.filter((topic) =>
     topic.normalizedDiscipline === normalizeName(activeDisciplineName)
     && topic.normalizedSubitem === normalizeName(activeSubitemName),
   );
@@ -195,6 +200,31 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   async function signOut() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.refresh();
+  }
+
+  async function removeTopic() {
+    if (!deleteCandidate) return;
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      const response = await fetch("/api/questions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discipline: deleteCandidate.discipline, subitem: deleteSubitem, key: deleteCandidate.key }),
+      });
+      const result = (await response.json()) as { message?: string };
+      if (!response.ok) throw new Error(result.message ?? "Não foi possível remover as questões.");
+      setVisibleTopics((current) => current.filter((topic) => !(
+        topic.normalizedDiscipline === deleteCandidate.normalizedDiscipline
+        && topic.normalizedSubitem === deleteCandidate.normalizedSubitem
+        && topic.key === deleteCandidate.key
+      )));
+      setDeleteCandidate(null);
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : "Não foi possível remover as questões.");
+    } finally {
+      setDeleteLoading(false);
+    }
   }
 
   return (
@@ -279,7 +309,13 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
             questionOrder={questionOrder}
             randomMode={randomMode}
             answers={answers}
+            deleteCandidate={deleteCandidate}
+            deleteLoading={deleteLoading}
+            deleteError={deleteError}
             onOpenTopic={openTopic}
+            onRequestDelete={(topic) => { setDeleteCandidate(topic); setDeleteSubitem(activeSubitemName); setDeleteError(""); }}
+            onCancelDelete={() => { if (!deleteLoading) { setDeleteCandidate(null); setDeleteError(""); } }}
+            onConfirmDelete={removeTopic}
             onSelectAnswer={(answer) => {
               const originalIndex = questionOrder[questionIndex] ?? questionIndex;
               setAnswers((current) => ({ ...current, [originalIndex]: answer }));
@@ -307,7 +343,13 @@ function DisciplinePage({
   questionOrder,
   randomMode,
   answers,
+  deleteCandidate,
+  deleteLoading,
+  deleteError,
   onOpenTopic,
+  onRequestDelete,
+  onCancelDelete,
+  onConfirmDelete,
   onSelectAnswer,
   onQuestionChange,
   onRandomModeChange,
@@ -325,7 +367,13 @@ function DisciplinePage({
   questionOrder: number[];
   randomMode: boolean;
   answers: Record<number, number>;
+  deleteCandidate: QuestionTopic | null;
+  deleteLoading: boolean;
+  deleteError: string;
   onOpenTopic: (topic: QuestionTopic) => void;
+  onRequestDelete: (topic: QuestionTopic) => void;
+  onCancelDelete: () => void;
+  onConfirmDelete: () => void;
   onSelectAnswer: (answer: number) => void;
   onQuestionChange: (index: number) => void;
   onRandomModeChange: (enabled: boolean) => void;
@@ -391,15 +439,31 @@ function DisciplinePage({
       </section>}
 
       {!quizLoading && !quizError && !quiz && filteredTopics.length > 0 ? <div className="topic-grid">
-        {filteredTopics.map((topic, index) => <button className={`topic-card ${selectedTopic === topic.title ? "topic-selected" : ""}`} key={topic.key} onClick={() => onOpenTopic(topic)}>
-          <div className="topic-card-top"><span className={`topic-icon ${color}`}>{String(index + 1).padStart(2, "0")}</span><span className="topic-arrow"><Icon name="arrow" size={17} /></span></div>
-          <span className="topic-label">ASSUNTO {String(index + 1).padStart(2, "0")}</span>
-          <h2>{topic.title}</h2>
-          <p>{topic.questionCount} {topic.questionCount === 1 ? "questão cadastrada" : "questões cadastradas"}</p>
-          <span className="topic-action">Selecionar assunto <Icon name="arrow" size={15} /></span>
-        </button>)}
+        {filteredTopics.map((topic, index) => <article className={`topic-card ${selectedTopic === topic.title ? "topic-selected" : ""}`} key={topic.key}>
+          <button type="button" className="topic-delete" aria-label={`Remover todas as questões de ${topic.title}`} title="Remover assunto e questões" onClick={() => onRequestDelete(topic)}>×</button>
+          <button type="button" className="topic-card-open" onClick={() => onOpenTopic(topic)}>
+            <div className="topic-card-top"><span className={`topic-icon ${color}`}>{String(index + 1).padStart(2, "0")}</span></div>
+            <span className="topic-label">ASSUNTO {String(index + 1).padStart(2, "0")}</span>
+            <h2>{topic.title}</h2>
+            <p>{topic.questionCount} {topic.questionCount === 1 ? "questão cadastrada" : "questões cadastradas"}</p>
+            <span className="topic-action">Selecionar assunto <Icon name="arrow" size={15} /></span>
+          </button>
+        </article>)}
       </div> : null}
       {!quizLoading && !quizError && !quiz && filteredTopics.length === 0 ? <div className="topics-empty">{topics.length ? `Nenhum assunto encontrado para “${query}”.` : "Ainda não há assuntos cadastrados para esta disciplina."}</div> : null}
+
+      {deleteCandidate && <div className="delete-dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onCancelDelete(); }}>
+        <section className="delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-dialog-title" aria-describedby="delete-dialog-description">
+          <div className="delete-dialog-icon" aria-hidden="true">×</div>
+          <h2 id="delete-dialog-title">Remover assunto?</h2>
+          <p id="delete-dialog-description">Deseja realmente remover <strong>{deleteCandidate.title}</strong> e todas as questões cadastradas nele? Essa ação não pode ser desfeita.</p>
+          {deleteError && <p className="delete-dialog-error" role="alert">{deleteError}</p>}
+          <div className="delete-dialog-actions">
+            <button type="button" className="delete-cancel" onClick={onCancelDelete} disabled={deleteLoading}>Cancelar</button>
+            <button type="button" className="delete-confirm" onClick={onConfirmDelete} disabled={deleteLoading}>{deleteLoading ? "Removendo..." : "Remover questões"}</button>
+          </div>
+        </section>
+      </div>}
 
       <footer className="page-footer"><span>Feito para aprender com leveza.</span><span>UM DIA DE CADA VEZ <span className="footer-spark">✳</span></span></footer>
     </section>

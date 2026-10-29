@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { listDisciplines } from "@/lib/disciplines";
-import { getQuestionTopic, saveQuestionTopics, type Question, type TopicImport } from "@/lib/questions";
+import { deleteQuestionTopic, getQuestionTopic, listQuestionTopicsForDiscipline, saveQuestionTopics, type Question, type TopicImport } from "@/lib/questions";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -68,7 +68,7 @@ export async function GET(request: Request) {
   const disciplineName = searchParams.get("discipline")?.trim() ?? "";
   const subitemName = searchParams.get("subitem")?.trim() ?? "";
   const key = searchParams.get("key") ?? "";
-  if (!disciplineName || !/^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(key)) {
+  if (!disciplineName || (key && !/^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(key))) {
     return Response.json({ message: "Disciplina ou assunto inválido." }, { status: 400 });
   }
 
@@ -81,6 +81,11 @@ export async function GET(request: Request) {
     }
     if (!discipline.subitems.length && subitemName) {
       return Response.json({ message: "Essa disciplina não possui subitens." }, { status: 400 });
+    }
+
+    if (!key) {
+      const topics = await listQuestionTopicsForDiscipline(discipline.name, subitemName);
+      return Response.json({ topics });
     }
 
     const topic = await getQuestionTopic(discipline.name, subitemName, key);
@@ -140,5 +145,46 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Falha ao salvar questões no MongoDB:", error);
     return Response.json({ message: "Não foi possível salvar no banco de dados. Verifique a conexão e tente novamente." }, { status: 503 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  if (!(await getCurrentUser())) {
+    return Response.json({ message: "Entre para remover questões." }, { status: 401 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ message: "Não foi possível ler os dados enviados." }, { status: 400 });
+  }
+
+  if (!isRecord(body) || typeof body.discipline !== "string" || typeof body.key !== "string" || !/^[a-z0-9]+(?:_[a-z0-9]+)*$/.test(body.key)) {
+    return Response.json({ message: "Disciplina ou assunto inválido." }, { status: 400 });
+  }
+  if (body.subitem !== undefined && typeof body.subitem !== "string") {
+    return Response.json({ message: "O subitem informado é inválido." }, { status: 400 });
+  }
+
+  try {
+    const disciplines = await listDisciplines();
+    const discipline = disciplines.find((item) => item.name === body.discipline);
+    if (!discipline) return Response.json({ message: "A disciplina não foi encontrada." }, { status: 404 });
+
+    const subitem = typeof body.subitem === "string" ? body.subitem : "";
+    if (discipline.subitems.length && !discipline.subitems.includes(subitem)) {
+      return Response.json({ message: "O subitem não pertence a essa disciplina." }, { status: 400 });
+    }
+    if (!discipline.subitems.length && subitem) {
+      return Response.json({ message: "Essa disciplina não possui subitens." }, { status: 400 });
+    }
+
+    const deleted = await deleteQuestionTopic(discipline.name, subitem, body.key);
+    if (!deleted) return Response.json({ message: "Esse assunto não foi encontrado." }, { status: 404 });
+    return Response.json({ message: "Assunto e questões removidos com sucesso." });
+  } catch (error) {
+    console.error("Falha ao remover questões no MongoDB:", error);
+    return Response.json({ message: "Não foi possível remover as questões. Verifique a conexão e tente novamente." }, { status: 503 });
   }
 }
