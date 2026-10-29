@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { listDisciplines } from "@/lib/disciplines";
-import { deleteQuestionTopic, getQuestionTopic, listQuestionTopicsForDiscipline, saveQuestionTopics, type Question, type TopicImport } from "@/lib/questions";
+import { deleteQuestionFromTopic, deleteQuestionTopic, getQuestionTopic, listQuestionTopicsForDiscipline, saveQuestionTopics, type Question, type TopicImport } from "@/lib/questions";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -166,6 +166,9 @@ export async function DELETE(request: Request) {
   if (body.subitem !== undefined && typeof body.subitem !== "string") {
     return Response.json({ message: "O subitem informado é inválido." }, { status: 400 });
   }
+  if (body.questionIndex !== undefined && (!Number.isInteger(body.questionIndex) || (body.questionIndex as number) < 0)) {
+    return Response.json({ message: "O índice da questão é inválido." }, { status: 400 });
+  }
 
   try {
     const disciplines = await listDisciplines();
@@ -178,6 +181,12 @@ export async function DELETE(request: Request) {
     }
     if (!discipline.subitems.length && subitem) {
       return Response.json({ message: "Essa disciplina não possui subitens." }, { status: 400 });
+    }
+
+    if (body.questionIndex !== undefined) {
+      const result = await deleteQuestionFromTopic(discipline.name, subitem, body.key, body.questionIndex as number);
+      if (!result) return Response.json({ message: "A questão não foi encontrada ou o assunto foi alterado. Atualize a página e tente novamente." }, { status: 404 });
+      return Response.json({ message: "Questão removida com sucesso.", ...result });
     }
 
     const deleted = await deleteQuestionTopic(discipline.name, subitem, body.key);

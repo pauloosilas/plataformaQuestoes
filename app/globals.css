@@ -518,6 +518,11 @@ html[data-theme="dark"] .question-form .field-hint code, html[data-theme="dark"]
 
 .question-session { max-width: 820px; padding: 23px; margin: 3px auto 0; border: 1px solid #e8eae3; border-radius: 12px; background: #fff; box-shadow: 0 12px 28px #303b1b08; }
 .question-session-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid #f0f0ec; color: #898b80; font-size: 11px; }
+.question-delete-button { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #ead4d0; border-radius: 6px; background: #fff9f8; color: #a35449; cursor: pointer; font-size: 10px; font-weight: 600; }
+.question-delete-button:hover:not(:disabled) { border-color: #dca8a0; background: #fbefed; }
+.question-delete-button:focus-visible { outline: 3px solid #d9877b66; outline-offset: 2px; }
+.question-delete-button:disabled { cursor: wait; opacity: .65; }
+.question-delete-error { padding: 9px 11px; margin: 12px 0 -8px; border: 1px solid #e2b6ae; border-radius: 6px; background: #fbefed; color: #8a4d46; font-size: 11px; }
 .quiz-back-button { padding: 5px 0; border: 0; background: transparent; color: #718653; cursor: pointer; font-size: 11px; font-weight: 600; }
 .quiz-back-button:hover { color: #4e6338; }
 .question-progress-heading { display: flex; justify-content: space-between; margin: 21px 0 8px; color: #828779; font-size: 9px; font-weight: 700; letter-spacing: .8px; }
@@ -571,6 +576,9 @@ html[data-theme="dark"] .question-form .field-hint code, html[data-theme="dark"]
 html[data-theme="dark"] .question-session { border-color: #343a31; background: #20241f; }
 html[data-theme="dark"] .question-session-top, html[data-theme="dark"] .question-navigation { border-color: #343a31; }
 html[data-theme="dark"] .question-session-top { color: #a1a598; }
+html[data-theme="dark"] .question-delete-button { border-color: #754b43; background: #342522; color: #e3b2a8; }
+html[data-theme="dark"] .question-delete-button:hover:not(:disabled) { background: #402c28; }
+html[data-theme="dark"] .question-delete-error { border-color: #754b43; background: #342522; color: #e3b2a8; }
 html[data-theme="dark"] .question-title { color: #eceee7; }
 html[data-theme="dark"] .question-mode-row { border-color: #343a31; background: #191d19; }
 html[data-theme="dark"] .question-mode-copy { color: #e2e5da; }

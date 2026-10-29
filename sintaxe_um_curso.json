@@ -1,0 +1,127 @@
+{
+  "topics": {
+    "sintaxe_um_curso": {
+      "title": "sintaxe um",
+      "questions": [
+        {
+          "question": "(Português com Letícia) Marque a alternativa que contenha uma frase nominal.",
+          "options": [
+            "A - Esse caminho é perigoso.",
+            "B - Bolsas despencam, e dólar sobe.",
+            "C - Não há problemas.",
+            "D - Tragédia completa um ano.",
+            "E - A volta de doenças perigosas."
+          ],
+          "correct": 4,
+          "explanation": "a) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“é”).<br/>b) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbos (“despencam” e “sobe”).<br/>c) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“há”).<br/>d) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“completa”).<br/>e) ✅ CORRETA | <u>Frase nominal</u>, ou seja, sem a presença de verbos."
+        },
+        {
+          "question": "(Português com Letícia) Leia as seguintes sentenças e, em seguida, marque a alternativa correta.<br/><br/>I. As crianças continuam ingerindo uma grande quantidade de açúcar.<br/>II. Nem sempre o doce é o vilão das dietas.<br/>III. Aumenta o número de crianças obesas, e pais devem estar atentos.",
+          "options": [
+            "A - A frase I é um período composto por possuir duas orações.",
+            "B - A frase II é um período simples, uma vez que possui apenas uma oração.",
+            "C - A frase III é um período composto por três orações.",
+            "D - A sentença II traz uma frase nominal.",
+            "E - A sentença III traz um período simples."
+          ],
+          "correct": 1,
+          "explanation": "I. <u>Período simples</u> (possui uma oração): há apenas uma locução verbal (“continuam ingerindo”).<br/>II. <u>Período simples</u> (possui uma oração): há apenas um verbo (“é”).<br/>III. <u>Período composto</u> (possui duas orações): há um verbo na primeira oração (“aumenta”), e uma locução verbal na segunda oração (“devem estar”)."
+        },
+        {
+          "question": "(FUNDATÉC - 2019 - Nível Médio) Quantas orações compõem o período a seguir?<br/><br/><i>“Declaramos clara e inequivocamente que o planeta Terra está enfrentando uma emergência climática”, afirmou uma declaração chamada “Emergência Climática” feita por mais de 11 mil cientistas do mundo.</i>",
+          "options": [
+            "A - 2.",
+            "B - 3.",
+            "C - 4.",
+            "D - 5.",
+            "E - 6."
+          ],
+          "correct": 3,
+          "explanation": "O trecho apresenta <u>cinco orações</u>. Separamos as orações e destacamos os verbos. Lembrando que cada oração possui um verbo ou locução verbal:<br/><br/>1ª: <u>Declaramos</u> clara e inequivocamente;<br/>2ª: que o planeta <u>está enfrentando</u> uma emergência climática;<br/>3ª: <u>afirmou</u> uma declaração;<br/>4ª: <u>chamada</u> “Emergência Climática”;<br/>5ª: <u>feita</u> por mais de 11 mil cientistas do mundo."
+        },
+        {
+          "question": "(Português com Letícia) Leia a seguinte manchete: “Peixe-agulha salta da água e fica cravado no pescoço de menino que viajava em barco.”<br/><br/>Sobre a manchete, pode-se afirmar que:",
+          "options": [
+            "A - trata-se de uma frase nominal.",
+            "B - transmite ao leitor a informação por meio de uma única oração.",
+            "C - é um período composto por três orações.",
+            "D - é um período simples.",
+            "E - é um período composto por duas orações."
+          ],
+          "correct": 2,
+          "explanation": "A manchete em questão apresenta <u>três orações</u>:<br/><br/>1ª: Peixe-agulha salta da água;<br/><br/>2ª: e fica cravado no pescoço de menino;<br/><br/>3ª: que viajava em barco."
+        },
+        {
+          "question": "(Português com Letícia) Julgue as afirmações a seguir, colocando V para as verdadeiras e F para as falsas. Em seguida, assinale a alternativa que apresenta a sequência correta.<br/><br/>(   ) A frase é um enunciado de sentido completo.<br/>(   ) A frase pode ou não conter verbo.<br/>(   ) A oração pode ou não conter verbo.<br/>(   ) O período simples é formado por apenas uma oração.",
+          "options": [
+            "A - V - V - F - V",
+            "B - V - V - V - F",
+            "C - F - V - F - V",
+            "D - V - F - F - V",
+            "E - F - F - V - V"
+          ],
+          "correct": 0,
+          "explanation": "(V) | A frase é um enunciado de sentido completo.<br/>(V) | A frase pode ou não conter verbo.<br/>(F) | É falsa a afirmativa “A oração pode ou não conter verbo”, uma vez que a oração possui necessariamente um verbo ou locução verbal.<br/>(V) | O período simples é formado por apenas uma oração."
+        },
+        {
+          "question": "(Instituto Excelência - 2019 - Nível Médio - adaptada) Levando-se em consideração os conceitos de frase, oração e período, assinale o período classificado como simples:",
+          "options": [
+            "A - “A corrupção que assolou o Brasil, especialmente o Estado do Rio, nos últimos anos provocou imenso prejuízo aos cofres públicos.”",
+            "B - “Uma das consequências mais perversas deste assalto aos contribuintes é o sucateamento de serviços básicos à população.”",
+            "C - “Uma das competências do Conselho Estadual de Defesa dos Direitos Humanos (CEDDH) previstas em lei é apurar as denúncias de violações ocorridas no Rio de Janeiro.”",
+            "D - “Muita gente acredita que esta definição limita-se a casos de agressões por parte de bandidos ou autoridades policiais.”"
+          ],
+          "correct": 1,
+          "explanation": "O <u>período</u> é uma unidade textual composta por uma ou mais <u>orações</u>. Quando um período possui apenas uma oração, é considerado um <u>período simples</u>. Por outro lado, um <u>período composto</u> é aquele que possui mais de uma oração.<br/><br/>O modo mais simples de identificar quantas orações o período apresenta é <u>identificar o número de verbos</u> (ou locuções verbais).<br/><br/>Observe que apenas a alternativa B apresenta um único verbo:<br/><br/>a) ❌ INCORRETA | “A corrupção que <u>assolou</u> o Brasil, especialmente o Estado do Rio, nos últimos anos <u>provocou</u> imenso prejuízo aos cofres públicos.”<br/><br/>b) ✅ CORRETA | “Uma das consequências mais perversas deste assalto aos contribuintes <u>é</u> o sucateamento de serviços básicos à população.”<br/><br/>c) ❌ INCORRETA | “Uma das competências do Conselho Estadual de Defesa dos Direitos Humanos (CEDDH) previstas em lei <u>é apurar</u> as denúncias de violações ocorridas no Rio de Janeiro.”<br/><br/>d) ❌ INCORRETA | “Muita gente <u>acredita</u> que esta definição <u>limita</u>-se a casos de agressões por parte de bandidos ou autoridades policiais.”"
+        },
+        {
+          "question": "(IBFC - 2022 - Nível Fundamental) Analise as afirmativas abaixo e dê valores Verdadeiro (V) ou Falso (F).<br/><br/>(   ) FRASE é todo enunciado linguístico capaz de estabelecer um processo de comunicação, ou seja, é todo enunciado que possui sentido completo.<br/>(   ) ORAÇÃO é toda estrutura linguística centrada em um verbo ou uma locução verbal.<br/>(   ) PERÍODO é a frase formada por apenas uma oração.<br/><br/>Assinale a alternativa que apresenta a sequência correta de cima para baixo.",
+          "options": [
+            "A - F - V - V.",
+            "B - V - V - V.",
+            "C - F - F - F.",
+            "D - V - V - F."
+          ],
+          "correct": 3,
+          "explanation": "(V) A afirmativa é verdadeira. Em termos mais simples, uma <u>frase</u> pode ser definida como uma declaração completa e compreensível, capaz de expressar ideias, emoções, ordens ou qualquer outro significado que seja plenamente comunicado e entendido.<br/><br/>(V) A afirmativa é verdadeira. A <u>oração</u> é caracterizada como uma frase que contém um verbo. É justamente essa presença do verbo que a distingue das demais frases. Por isso, dizemos que nem toda frase pode ser considerada uma oração. Além disso, a frase que não tem verbo é denominada <u>frase nominal</u>.<br/><br/>(F) A afirmativa é falsa. O <u>período</u> é uma unidade textual composta por uma ou mais orações. Quando um período possui apenas uma oração, é considerado um <u>período simples</u>. Por outro lado, um <u>período composto</u> é aquele que possui mais de uma oração, podendo essas orações estarem conectadas por meio de coordenação ou subordinação."
+        },
+        {
+          "question": "(FGV - 2014 - Nível Superior) “Um meio de fazer justiça social é favorecer esse tipo de imposto”.<br/><br/>Assinale a opção que indica a forma correta de reescrever-se a segunda oração desse período, transformando-a em frase nominal.",
+          "options": [
+            "A - Que se favoreça esse tipo de imposto.",
+            "B - O favorecimento desse tipo de imposto.",
+            "C - O favor desse tipo de imposto.",
+            "D - Que se favorecesse esse tipo de imposto.",
+            "E - Que favoreçam esse tipo de imposto."
+          ],
+          "correct": 1,
+          "explanation": "Uma oração é caracterizada como uma frase que contém um verbo, podendo ser chamada, também, de frase verbal. Então, a frase que não tem verbo será denominada frase nominal. Sendo assim, a questão pede que uma frase verbal seja transformada em frase nominal.<br/><br/>Para reescrever a frase verbal <i>“favorecer esse tipo de imposto”</i> como uma frase nominal é necessário transformar o verbo “favorecer” em substantivo (favorecimento).<br/><br/>Por isso, temos a alternativa B como correta. As alternativas A, D e E estão incorretas justamente por apresentarem verbos em suas composições. Confira:<br/><br/>a) ❌ INCORRETA | “Que se <u>favoreça</u> esse tipo de imposto.”<br/>b) ✅ CORRETA | “O favorecimento desse tipo de imposto.”<br/>c) ❌ INCORRETA | A alternativa C (“O favor desse tipo de imposto”) não apresenta uma reescrita adequada para o excerto sinalizado no enunciado.<br/>d) ❌ INCORRETA | “Que se <u>favorecesse</u> esse tipo de imposto.”<br/>e) ❌ INCORRETA | “Que <u>favoreçam</u> esse tipo de imposto.”"
+        },
+        {
+          "question": "(CPCON - 2023 - Nível Médio) Selecione a proposição com uma análise correta das relações sintáticas, semânticas e pragmáticas de: <i>“O cenário bem diferente do atual existiu antes (e até após) da separação dos continentes da América do Sul e África.”</i><br/><br/>I - A estrutura linguística exposta é uma frase, por ter significação e função de ato comunicativo.<br/><br/>II - A estrutura linguística exposta corresponde a um período do tipo composto, dado seu arranjo sintático.<br/><br/>III - A estrutura linguística exposta corresponde a um período composto, porque é uma frase e apresenta três orações.<br/><br/>IV - A estrutura linguística exposta corresponde a um período do tipo simples, porque é uma frase e apresenta uma oração.<br/><br/>É CORRETO o que se afirma apenas em:",
+          "options": [
+            "A - I.",
+            "B - II e III.",
+            "C - I e IV.",
+            "D - I, II e IV.",
+            "E - I, III e IV."
+          ],
+          "correct": 2,
+          "explanation": "I. CORRETA | Nem toda frase é uma oração, mas toda oração é uma frase. Além disso, lembramos que uma frase pode ser definida como uma expressão linguística que <u>transmite uma mensagem completa</u>, englobando pensamentos, sentimentos, instruções, solicitações ou qualquer outro sentido que seja claramente transmitido e compreendido.<br/><br/>II. INCORRETA | Note que temos apenas um verbo (“existiu”), então temos apenas uma oração. Isso significa que o período é simples, não composto.<br/><br/>III. INCORRETA | O período possui apenas um verbo, ou seja, uma oração (não três orações), o que corresponde a um período simples, não composto.<br/><br/>IV. CORRETA | O item IV resume o que já vimos nos itens anteriores."
+        },
+        {
+          "question": "(Português com Letícia) Marque a alternativa que contenha uma frase nominal.",
+          "options": [
+            "A - Preço do combustível sobe.",
+            "B - Nova queda do dólar.",
+            "C - Ações da empresa despencam.",
+            "D - Cai a cotação do trigo.",
+            "E - Petróleo registra nova alta."
+          ],
+          "correct": 1,
+          "explanation": "a) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“sobe”).<br/>b) ✅ CORRETA | <u>Frase nominal</u>, ou seja, sem a presença de verbos.<br/>c) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“despencam”).<br/>d) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“cai”).<br/>e) ❌ INCORRETA | <u>Frase verbal</u>, pois contém verbo (“registra”)."
+        }
+      ]
+    }
+  }
+}

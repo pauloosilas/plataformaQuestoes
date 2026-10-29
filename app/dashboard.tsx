@@ -111,6 +111,8 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   const [quiz, setQuiz] = useState<QuizTopic | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizError, setQuizError] = useState("");
+  const [deletingQuestion, setDeletingQuestion] = useState(false);
+  const [questionDeleteError, setQuestionDeleteError] = useState("");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [randomMode, setRandomMode] = useState(false);
   const [questionOrder, setQuestionOrder] = useState<number[]>([]);
@@ -138,6 +140,7 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
     setSelectedTopic("");
     setQuiz(null);
     setQuizError("");
+    setQuestionDeleteError("");
     setQuestionIndex(0);
     setQuestionOrder([]);
     setAnswers({});
@@ -149,6 +152,7 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
     setSelectedTopic(topic.title);
     setQuiz(null);
     setQuizError("");
+    setQuestionDeleteError("");
     setQuizLoading(true);
     setQuestionIndex(0);
     setQuestionOrder([]);
@@ -178,6 +182,7 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   function closeQuiz() {
     setQuiz(null);
     setQuizError("");
+    setQuestionDeleteError("");
     setSelectedTopic("");
     setQuestionIndex(0);
     setQuestionOrder([]);
@@ -200,6 +205,42 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
   async function signOut() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.refresh();
+  }
+
+  async function removeCurrentQuestion() {
+    if (!quiz) return;
+    const originalIndex = questionOrder[questionIndex] ?? questionIndex;
+    const lastQuestion = quiz.questions.length === 1;
+    const confirmation = lastQuestion
+      ? "Esta é a última questão do assunto. Ao removê-la, o assunto também será removido. Deseja continuar?"
+      : "Deseja realmente remover esta questão do banco de dados?";
+    if (!window.confirm(confirmation)) return;
+
+    setDeletingQuestion(true);
+    setQuestionDeleteError("");
+    try {
+      const response = await fetch("/api/questions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discipline: activeDisciplineName, subitem: activeSubitemName, key: quiz.key, questionIndex: originalIndex }),
+      });
+      const result = (await response.json()) as { message?: string; topicRemoved?: boolean };
+      if (!response.ok) throw new Error(result.message ?? "Não foi possível remover a questão.");
+
+      setVisibleTopics((current) => current.flatMap((topic) => {
+        const isCurrentTopic = topic.normalizedDiscipline === normalizeName(activeDisciplineName)
+          && topic.normalizedSubitem === normalizeName(activeSubitemName)
+          && topic.key === quiz.key;
+        if (!isCurrentTopic) return [topic];
+        if (result.topicRemoved) return [];
+        return [{ ...topic, questionCount: Math.max(0, topic.questionCount - 1) }];
+      }));
+      closeQuiz();
+    } catch (error) {
+      setQuestionDeleteError(error instanceof Error ? error.message : "Não foi possível remover a questão.");
+    } finally {
+      setDeletingQuestion(false);
+    }
   }
 
   async function removeTopic() {
@@ -309,10 +350,13 @@ export default function Home({ disciplines, questionTopics }: { disciplines: Dis
             questionOrder={questionOrder}
             randomMode={randomMode}
             answers={answers}
+            deletingQuestion={deletingQuestion}
+            questionDeleteError={questionDeleteError}
             deleteCandidate={deleteCandidate}
             deleteLoading={deleteLoading}
             deleteError={deleteError}
             onOpenTopic={openTopic}
+            onRemoveQuestion={removeCurrentQuestion}
             onRequestDelete={(topic) => { setDeleteCandidate(topic); setDeleteSubitem(activeSubitemName); setDeleteError(""); }}
             onCancelDelete={() => { if (!deleteLoading) { setDeleteCandidate(null); setDeleteError(""); } }}
             onConfirmDelete={removeTopic}
@@ -343,10 +387,13 @@ function DisciplinePage({
   questionOrder,
   randomMode,
   answers,
+  deletingQuestion,
+  questionDeleteError,
   deleteCandidate,
   deleteLoading,
   deleteError,
   onOpenTopic,
+  onRemoveQuestion,
   onRequestDelete,
   onCancelDelete,
   onConfirmDelete,
@@ -367,10 +414,13 @@ function DisciplinePage({
   questionOrder: number[];
   randomMode: boolean;
   answers: Record<number, number>;
+  deletingQuestion: boolean;
+  questionDeleteError: string;
   deleteCandidate: QuestionTopic | null;
   deleteLoading: boolean;
   deleteError: string;
   onOpenTopic: (topic: QuestionTopic) => void;
+  onRemoveQuestion: () => void;
   onRequestDelete: (topic: QuestionTopic) => void;
   onCancelDelete: () => void;
   onConfirmDelete: () => void;
@@ -399,7 +449,8 @@ function DisciplinePage({
       {!quizLoading && quizError && <div className="quiz-error" role="alert"><p>{quizError}</p><button type="button" onClick={onCloseQuiz}>Voltar aos assuntos</button></div>}
 
       {!quizLoading && quiz && currentQuestion && <section className="question-session" aria-label={`Questões de ${quiz.title}`}>
-        <div className="question-session-top"><button type="button" className="quiz-back-button" onClick={onCloseQuiz}>← <span>Voltar aos assuntos</span></button><span>{quiz.title}</span></div>
+        <div className="question-session-top"><button type="button" className="quiz-back-button" onClick={onCloseQuiz}>← <span>Voltar aos assuntos</span></button><span>{quiz.title}</span><button type="button" className="question-delete-button" onClick={onRemoveQuestion} disabled={deletingQuestion} aria-label="Remover questão atual">{deletingQuestion ? "Removendo..." : "× Remover questão"}</button></div>
+        {questionDeleteError && <p className="question-delete-error" role="alert">{questionDeleteError}</p>}
         <div className="question-progress-heading"><span>QUESTÃO {String(questionIndex + 1).padStart(2, "0")}</span><span>{answeredCount} de {quiz.questions.length} respondidas</span></div>
         <div className="question-progress-track" role="progressbar" aria-label="Questões respondidas" aria-valuemin={0} aria-valuemax={quiz.questions.length} aria-valuenow={answeredCount}><span style={{ width: `${(answeredCount / quiz.questions.length) * 100}%` }} /></div>
         <article className="question-content">

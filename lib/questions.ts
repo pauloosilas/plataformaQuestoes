@@ -146,3 +146,26 @@ export async function deleteQuestionTopic(discipline: string, subitem: string, k
   });
   return result.deletedCount > 0;
 }
+
+export async function deleteQuestionFromTopic(discipline: string, subitem: string, key: string, questionIndex: number) {
+  const collection = await getQuestionTopicsCollection();
+  const filter = {
+    normalizedDiscipline: normalizeName(discipline),
+    normalizedSubitem: normalizeName(subitem),
+    key,
+  };
+  const topic = await collection.findOne(filter, { projection: { questions: 1 } });
+  if (!topic || questionIndex < 0 || questionIndex >= topic.questions.length) return null;
+
+  const remainingQuestions = topic.questions.filter((_, index) => index !== questionIndex);
+  if (!remainingQuestions.length) {
+    const result = await collection.deleteOne({ ...filter, questions: topic.questions });
+    return result.deletedCount ? { topicRemoved: true } : null;
+  }
+
+  const result = await collection.updateOne(
+    { ...filter, questions: topic.questions },
+    { $set: { questions: remainingQuestions, updatedAt: new Date() } },
+  );
+  return result.modifiedCount ? { topicRemoved: false } : null;
+}
